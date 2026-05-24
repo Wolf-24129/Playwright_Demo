@@ -1,0 +1,100 @@
+# Instructions
+
+- Following Playwright test failed.
+- Explain why, be concise, respect Playwright best practices.
+- Provide a snippet of code with the fix, if possible.
+
+# Test info
+
+- Name: loginpage.spec.ts >> OrangeHRM login >> should login successfully with valid admin credentials
+- Location: tests\loginpage.spec.ts:65:7
+
+# Error details
+
+```
+TimeoutError: page.goto: Timeout 90000ms exceeded.
+Call log:
+  - navigating to "https://opensource-demo.orangehrmlive.com/", waiting until "load"
+
+```
+
+# Test source
+
+```ts
+  1  | import { test, expect, Page } from "@playwright/test";
+  2  | 
+  3  | test.use({
+  4  |   navigationTimeout: 90000,
+  5  |   actionTimeout: 60000,
+  6  | });
+  7  | 
+  8  | class OrangeHRMLoginPage {
+  9  |   // Increase per-test timeout since this depends on external network/site availability.
+  10 |   static readonly TEST_TIMEOUT_MS = 120000;
+  11 |   readonly page: Page;
+  12 |   readonly usernameInput = 'input[name="username"]';
+  13 |   readonly passwordInput = 'input[name="password"]';
+  14 |   readonly loginButton = 'button[type="submit"]';
+  15 |   readonly dashboardHeading = 'h6:has-text("Dashboard")';
+  16 | 
+  17 |   constructor(page: Page) {
+  18 |     this.page = page;
+  19 |   }
+  20 | 
+  21 |   async goto() {
+> 22 |     await this.page.goto("https://opensource-demo.orangehrmlive.com/", {
+     |                     ^ TimeoutError: page.goto: Timeout 90000ms exceeded.
+  23 |       waitUntil: "load",
+  24 |       timeout: 90000,
+  25 |     });
+  26 | 
+  27 |     // If the page is still loading resources after DOMContentLoaded, allow more time.
+  28 |     await this.page
+  29 |       .waitForLoadState("load", { timeout: 60000 })
+  30 |       .catch(() => undefined);
+  31 | 
+  32 |     // Some runs of this site can be slow/flaky right after DOMContentLoaded.
+  33 |     // Wait until the network is quiet OR fall back to full load.
+  34 |     await Promise.race([
+  35 |       this.page
+  36 |         .waitForLoadState("networkidle", { timeout: 30000 })
+  37 |         .catch(() => undefined),
+  38 |       this.page.waitForLoadState("load", { timeout: 30000 }),
+  39 |     ]);
+  40 | 
+  41 |     await this.page.waitForSelector(this.usernameInput, {
+  42 |       state: "visible",
+  43 |       timeout: 90000,
+  44 |     });
+  45 |   }
+  46 | 
+  47 |   async login(username: string, password: string) {
+  48 |     await this.page.fill(this.usernameInput, username);
+  49 |     await this.page.fill(this.passwordInput, password);
+  50 |     await this.page.click(this.loginButton);
+  51 | 
+  52 |     await expect(this.page.locator(this.dashboardHeading)).toBeVisible({
+  53 |       timeout: 90000,
+  54 |     });
+  55 |   }
+  56 | 
+  57 |   async expectDashboard() {
+  58 |     await expect(this.page.locator(this.dashboardHeading)).toBeVisible({
+  59 |       timeout: 60000,
+  60 |     });
+  61 |   }
+  62 | }
+  63 | 
+  64 | test.describe("OrangeHRM login", () => {
+  65 |   test("should login successfully with valid admin credentials", async ({
+  66 |     page,
+  67 |   }) => {
+  68 |     const loginPage = new OrangeHRMLoginPage(page);
+  69 | 
+  70 |     await loginPage.goto();
+  71 |     await loginPage.login("Admin", "admin123");
+  72 |     await loginPage.expectDashboard();
+  73 |   });
+  74 | });
+  75 | 
+```

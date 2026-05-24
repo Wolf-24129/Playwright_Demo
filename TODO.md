@@ -1,5 +1,7 @@
-- [ ] Review current Playwright workflow and align it with Playwright config outputs (JUnit/Allure).
-- [ ] Update `.github/workflows/playwright.yml` to run **all tests**.
-- [ ] Add guards to avoid failing on missing `allure-results` / `test-results/results.xml`.
-- [ ] Ensure artifacts upload steps run safely across OSes.
-- [ ] Run a quick local sanity check (optional) or at least `npm test`.
+- [x] Review repository structure and relevant Playwright files
+- [x] Identify current failing test: tests/loginpage.spec.ts (OrangeHRM login) times out on page.goto
+- [ ] Implement fixes:
+  - [x] Update tests/loginpage.spec.ts to increase timeout and make navigation more robust
+  - [ ] Update playwright.config.ts to remove custom process declaration and align timeouts consistently
+  - [ ] Update .github/workflows/playwright.yml to make Allure/JUnit steps non-failing on missing artifacts/paths and upload reports safely
+- [ ] Run `npx playwright test` locally and confirm all tests pass

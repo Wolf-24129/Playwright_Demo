@@ -1,9 +1,5 @@
 import { defineConfig, devices } from "@playwright/test";
 
-// Provide minimal declaration for `process` so TypeScript won't require
-// @types/node in simple Playwright config scenarios.
-declare const process: { env: { CI?: string } };
-
 /**
  * Read environment variables from file.
  * https://github.com/motdotla/dotenv
@@ -15,8 +11,11 @@ declare const process: { env: { CI?: string } };
 /**
  * See https://playwright.dev/docs/test-configuration.
  */
+declare const process: { env: { CI?: string } };
+
 export default defineConfig({
   testDir: "./tests",
+  timeout: 120000,
   /* Run tests in files in parallel */
   fullyParallel: true,
   /* Fail the build on CI if you accidentally left test.only in the source code. */

@@ -1,0 +1,87 @@
+# Instructions
+
+- Following Playwright test failed.
+- Explain why, be concise, respect Playwright best practices.
+- Provide a snippet of code with the fix, if possible.
+
+# Test info
+
+- Name: loginpage.spec.ts >> OrangeHRM login >> should login successfully with valid admin credentials
+- Location: tests\loginpage.spec.ts:48:7
+
+# Error details
+
+```
+Test timeout of 30000ms exceeded.
+```
+
+```
+Error: page.goto: Test timeout of 30000ms exceeded.
+Call log:
+  - navigating to "https://opensource-demo.orangehrmlive.com/", waiting until "domcontentloaded"
+
+```
+
+# Test source
+
+```ts
+  1  | import { test, expect, Page } from "@playwright/test";
+  2  | 
+  3  | test.use({
+  4  |   navigationTimeout: 60000,
+  5  |   actionTimeout: 60000,
+  6  | });
+  7  | 
+  8  | class OrangeHRMLoginPage {
+  9  |   readonly page: Page;
+  10 |   readonly usernameInput = 'input[name="username"]';
+  11 |   readonly passwordInput = 'input[name="password"]';
+  12 |   readonly loginButton = 'button[type="submit"]';
+  13 |   readonly dashboardHeading = 'h6:has-text("Dashboard")';
+  14 | 
+  15 |   constructor(page: Page) {
+  16 |     this.page = page;
+  17 |   }
+  18 | 
+  19 |   async goto() {
+> 20 |     await this.page.goto("https://opensource-demo.orangehrmlive.com/", {
+     |                     ^ Error: page.goto: Test timeout of 30000ms exceeded.
+  21 |       waitUntil: "domcontentloaded",
+  22 |       timeout: 60000,
+  23 |     });
+  24 |     await this.page.waitForSelector(this.usernameInput, {
+  25 |       state: "visible",
+  26 |       timeout: 60000,
+  27 |     });
+  28 |   }
+  29 | 
+  30 |   async login(username: string, password: string) {
+  31 |     await this.page.fill(this.usernameInput, username);
+  32 |     await this.page.fill(this.passwordInput, password);
+  33 |     await this.page.click(this.loginButton);
+  34 |     await this.page.waitForSelector(this.dashboardHeading, {
+  35 |       state: "visible",
+  36 |       timeout: 60000,
+  37 |     });
+  38 |   }
+  39 | 
+  40 |   async expectDashboard() {
+  41 |     await expect(this.page.locator(this.dashboardHeading)).toBeVisible({
+  42 |       timeout: 60000,
+  43 |     });
+  44 |   }
+  45 | }
+  46 | 
+  47 | test.describe("OrangeHRM login", () => {
+  48 |   test("should login successfully with valid admin credentials", async ({
+  49 |     page,
+  50 |   }) => {
+  51 |     const loginPage = new OrangeHRMLoginPage(page);
+  52 | 
+  53 |     await loginPage.goto();
+  54 |     await loginPage.login("Admin", "admin123");
+  55 |     await loginPage.expectDashboard();
+  56 |   });
+  57 | });
+  58 | 
+```

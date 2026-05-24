@@ -34,10 +34,12 @@ jobs:
       - name: Publish Playwright JUnit results
         uses: dorny/test-reporter@v1
         if: always()
+        continue-on-error: true
         with:
           name: Playwright tests
           path: test-results/results.xml
           reporter: junit
+          fail-on-error: false
 
       - name: Generate Allure report
         if: always()
@@ -52,6 +54,7 @@ jobs:
       - name: Upload Allure report artifact
         uses: actions/upload-artifact@v4
         if: always()
+        continue-on-error: true
         with:
           name: allure-report-${{ matrix.os }}-node${{ matrix.node-version }}
 
@@ -61,6 +64,7 @@ jobs:
       - name: Upload Playwright Report
         uses: actions/upload-artifact@v4
         if: ${{ always() }}
+        continue-on-error: true
         with:
           name: playwright-report-${{ matrix.os }}-node${{ matrix.node-version }}
 
@@ -70,6 +74,7 @@ jobs:
       - name: Upload test-results
         uses: actions/upload-artifact@v4
         if: ${{ always() }}
+        continue-on-error: true
         with:
           name: test-results-${{ matrix.os }}-node${{ matrix.node-version }}
 
