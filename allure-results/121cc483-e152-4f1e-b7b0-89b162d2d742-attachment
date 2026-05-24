@@ -1,0 +1,69 @@
+# Instructions
+
+- Following Playwright test failed.
+- Explain why, be concise, respect Playwright best practices.
+- Provide a snippet of code with the fix, if possible.
+
+# Test info
+
+- Name: loginpage.spec.ts >> OrangeHRM login >> should login successfully with valid admin credentials
+- Location: tests\loginpage.spec.ts:30:7
+
+# Error details
+
+```
+Test timeout of 30000ms exceeded.
+```
+
+```
+Error: page.goto: Test timeout of 30000ms exceeded.
+Call log:
+  - navigating to "https://opensource-demo.orangehrmlive.com/", waiting until "load"
+
+```
+
+# Test source
+
+```ts
+  1  | import { test, expect, Page } from "@playwright/test";
+  2  | 
+  3  | class OrangeHRMLoginPage {
+  4  |   readonly page: Page;
+  5  |   readonly usernameInput = 'input[name="username"]';
+  6  |   readonly passwordInput = 'input[name="password"]';
+  7  |   readonly loginButton = 'button[type="submit"]';
+  8  |   readonly dashboardHeading = 'h6:has-text("Dashboard")';
+  9  | 
+  10 |   constructor(page: Page) {
+  11 |     this.page = page;
+  12 |   }
+  13 | 
+  14 |   async goto() {
+> 15 |     await this.page.goto("https://opensource-demo.orangehrmlive.com/");
+     |                     ^ Error: page.goto: Test timeout of 30000ms exceeded.
+  16 |   }
+  17 | 
+  18 |   async login(username: string, password: string) {
+  19 |     await this.page.fill(this.usernameInput, username);
+  20 |     await this.page.fill(this.passwordInput, password);
+  21 |     await this.page.click(this.loginButton);
+  22 |   }
+  23 | 
+  24 |   async expectDashboard() {
+  25 |     await expect(this.page.locator(this.dashboardHeading)).toBeVisible();
+  26 |   }
+  27 | }
+  28 | 
+  29 | test.describe("OrangeHRM login", () => {
+  30 |   test("should login successfully with valid admin credentials", async ({
+  31 |     page,
+  32 |   }) => {
+  33 |     const loginPage = new OrangeHRMLoginPage(page);
+  34 | 
+  35 |     await loginPage.goto();
+  36 |     await loginPage.login("Admin", "admin123");
+  37 |     await loginPage.expectDashboard();
+  38 |   });
+  39 | });
+  40 | 
+```
