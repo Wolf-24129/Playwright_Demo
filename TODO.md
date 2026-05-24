@@ -1,0 +1,5 @@
+- [ ] Review current Playwright workflow and align it with Playwright config outputs (JUnit/Allure).
+- [ ] Update `.github/workflows/playwright.yml` to run **all tests**.
+- [ ] Add guards to avoid failing on missing `allure-results` / `test-results/results.xml`.
+- [ ] Ensure artifacts upload steps run safely across OSes.
+- [ ] Run a quick local sanity check (optional) or at least `npm test`.
