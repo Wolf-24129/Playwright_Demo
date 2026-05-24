@@ -14,7 +14,6 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
         node-version: [18.x, 20.x, lts/*]
-        node-name: [18.x, 20.x, lts]
 
     steps:
       - uses: actions/checkout@v4
@@ -40,7 +39,7 @@ jobs:
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: allure-report-${{ matrix.os }}-node${{ matrix.node-name }}
+          name: allure-report-${{ matrix.os }}-node${{ replace(matrix.node-version, '/', '-') }}
           path: allure-report/
           retention-days: 30
 
@@ -48,7 +47,7 @@ jobs:
         uses: actions/upload-artifact@v4
         if: ${{ always() }}
         with:
-          name: playwright-report-${{ matrix.os }}-node${{ matrix.node-name }}
+          name: playwright-report-${{ matrix.os }}-node${{ replace(matrix.node-version, '/', '-') }}
           path: playwright-report/
           retention-days: 30
 
@@ -56,6 +55,6 @@ jobs:
         uses: actions/upload-artifact@v4
         if: ${{ always() }}
         with:
-          name: test-results-${{ matrix.os }}-node${{ matrix.node-name }}
+          name: test-results-${{ matrix.os }}-node${{ replace(matrix.node-version, '/', '-') }}
           path: test-results/
           retention-days: 30
